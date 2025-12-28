@@ -6,12 +6,12 @@
 		commands: CommandMap;
 		welcomeMessage: string;
 		currentPath?: string;
+		history?: CommandOutput[];
 	}
 
-	let { commands, welcomeMessage, currentPath = '~/portfolio' }: Props = $props();
+	let { commands, welcomeMessage, currentPath = '~/portfolio', history = $bindable([]) }: Props = $props();
 
 	let input = $state('');
-	let history = $state<CommandOutput[]>([]);
 	let terminalInput: HTMLInputElement;
 	let isTyping = $state(false);
 

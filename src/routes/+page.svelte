@@ -26,4 +26,4 @@
 <p class="text-slate-400 text-xs mt-1">Type 'help' to see available commands.</p>`);
 </script>
 
-<Terminal {commands} {welcomeMessage} />
+<Terminal {commands} {welcomeMessage} bind:history />
