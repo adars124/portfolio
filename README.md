@@ -306,34 +306,51 @@ Before deploying to production:
 
 ## Deployment
 
+This project is configured for deployment to **Vercel** with **Turso** database.
+
+### Quick Deploy
+
+For complete step-by-step deployment instructions, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+The deployment guide covers:
+- Setting up Turso database (free tier)
+- Deploying to Vercel
+- Configuring your custom domain
+- Database migrations
+- Security best practices
+- Continuous deployment setup
+
 ### Build for Production
 
 ```bash
 yarn build
 ```
 
-### Environment Variables
+### Environment Variables (Production)
 
-Set these in your production environment:
+Set these in Vercel:
 
 ```bash
+# Required for production
+TURSO_DATABASE_URL=libsql://your-database.turso.io
+TURSO_AUTH_TOKEN=your-auth-token
 NODE_ENV=production
-DATABASE_URL=/path/to/production.db
+
+# Fallback (always include)
+DATABASE_URL=local.db
 ```
 
 ### Adapter Configuration
 
-The project uses `@sveltejs/adapter-auto` which automatically detects your deployment platform. Supported platforms include:
-
-- Vercel
-- Netlify
-- Cloudflare Pages
-- And more
-
-For specific platforms, you may want to install a dedicated adapter. See [SvelteKit adapters documentation](https://svelte.dev/docs/kit/adapters).
+The project uses `@sveltejs/adapter-vercel` optimized for Vercel deployment with:
+- Node.js 22.x runtime
+- Automatic serverless functions
+- Edge network optimization
+- Zero-config deployment
 
 ## Documentation
 
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Complete deployment guide for Vercel
 - [ADMIN.md](ADMIN.md) - Comprehensive admin panel guide
 - [BLOG.md](BLOG.md) - Blog system documentation
 - [DATABASE.md](DATABASE.md) - Database schema and management

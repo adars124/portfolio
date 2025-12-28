@@ -1,11 +1,30 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { drizzle as drizzleSqlite, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { drizzle as drizzleLibsql, type LibSQLDatabase } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
 import Database from 'better-sqlite3';
 import * as schema from './schema';
 import { createHash } from 'crypto';
 
 const DATABASE_URL = process.env.DATABASE_URL || 'local.db';
-const client = new Database(DATABASE_URL);
-const db = drizzle(client, { schema });
+
+// Use Turso (libsql) if TURSO_DATABASE_URL is set, otherwise use local SQLite
+let db: BetterSQLite3Database<typeof schema> | LibSQLDatabase<typeof schema>;
+let sqliteClient: Database.Database | undefined;
+
+if (process.env.TURSO_DATABASE_URL) {
+	// Production: Use Turso
+	const client = createClient({
+		url: process.env.TURSO_DATABASE_URL,
+		authToken: process.env.TURSO_AUTH_TOKEN
+	});
+	db = drizzleLibsql(client, { schema });
+	console.log('📡 Using Turso database');
+} else {
+	// Development: Use local SQLite
+	sqliteClient = new Database(DATABASE_URL);
+	db = drizzleSqlite(sqliteClient, { schema });
+	console.log('💾 Using local SQLite database');
+}
 
 function hashPassword(password: string): string {
 	return createHash('sha256').update(password).digest('hex');
@@ -283,7 +302,11 @@ agent = AgentExecutor(tools=tools, llm=llm)
 	]);
 
 	console.log('✅ Database seeded successfully!');
-	client.close();
+
+	// Close the database connection if using SQLite
+	if (sqliteClient) {
+		sqliteClient.close();
+	}
 }
 
 seed().catch((error) => {
