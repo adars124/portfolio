@@ -1,4 +1,5 @@
 import type { CommandMap } from '$lib/types/terminal';
+import { getGeminiService } from '$lib/services/gemini';
 
 interface PersonalInfo {
 	name: string;
@@ -59,8 +60,13 @@ export const createCommands = (
 				'  contact     - Get in touch',
 				'  projects    - View projects',
 				'  blog        - Visit the blog',
+				'  ai          - AI assistant info',
 				'  clear       - Clear the terminal',
 				'  help        - Show this help message',
+				'',
+				'🤖 AI Assistant:',
+				'  Type anything else to chat with AI!',
+				'  The AI can answer questions, help with tasks, and more.',
 				''
 			]
 		},
@@ -264,8 +270,43 @@ export const createCommands = (
 			description: 'Clear terminal',
 			execute: () => {
 				clearHistory();
-				return [];
+				// Also clear AI conversation memory
+				const gemini = getGeminiService();
+				gemini.clearHistory();
+				return ['Terminal cleared. AI conversation memory reset.'];
 			}
+		},
+
+		ai: {
+			description: 'AI assistant information',
+			execute: () => [
+				'╔════════════════════════════════════════════════════════╗',
+				'║                      JARVIS                            ║',
+				'╚════════════════════════════════════════════════════════╝',
+				'',
+				'  🤖 Jarvis - Aadarsha\'s AI Assistant',
+				'',
+				'  Yo! I\'m Jarvis, built by Aadarsha to help you out.',
+				'  Just type whatever you want, and I\'ll handle it.',
+				'  No special commands needed - just talk to me like a person.',
+				'',
+				'  Try asking me:',
+				'    • "Who is Aadarsha?"',
+				'    • "What projects has Aadarsha worked on?"',
+				'    • "What\'s the latest in AI?"',
+				'    • "Help me with some code"',
+				'    • "Tell me a joke" (I got some good ones)',
+				'',
+				'  What I can do:',
+				'    ✓ Answer questions about Aadarsha',
+				'    ✓ Web search for current info',
+				'    ✓ Help with coding and tech stuff',
+				'    ✓ Keep the conversation going (I remember context)',
+				'    ✓ Be cool and helpful at the same time',
+				'',
+				'  Real talk: I\'m here to make your life easier. Easy.',
+				''
+			]
 		}
 	};
 };
