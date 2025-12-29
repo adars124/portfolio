@@ -37,10 +37,7 @@ interface PortfolioData {
 	projects: any[];
 }
 
-export const createCommands = (
-	data: PortfolioData,
-	clearHistory: () => void
-): CommandMap => {
+export const createCommands = (data: PortfolioData, clearHistory: () => void): CommandMap => {
 	const { personalInfo, workExperience, education, skills, projects } = data;
 
 	if (!personalInfo) {
@@ -256,13 +253,7 @@ export const createCommands = (
 				if (typeof window !== 'undefined') {
 					window.location.href = '/blog';
 				}
-				return [
-					'',
-					'  Redirecting to blog...',
-					'',
-					'  Or visit: /blog',
-					''
-				];
+				return ['', '  Redirecting to blog...', '', '  Or visit: /blog', ''];
 			}
 		},
 
@@ -284,10 +275,10 @@ export const createCommands = (
 				'║                      JARVIS                            ║',
 				'╚════════════════════════════════════════════════════════╝',
 				'',
-				'  🤖 Jarvis - Aadarsha\'s AI Assistant',
+				"  🤖 Jarvis - Aadarsha's AI Assistant",
 				'',
-				'  Yo! I\'m Jarvis, built by Aadarsha to help you out.',
-				'  Just type whatever you want, and I\'ll handle it.',
+				"  Yo! I'm Jarvis, built by Aadarsha to help you out.",
+				"  Just type whatever you want, and I'll handle it.",
 				'  No special commands needed - just talk to me like a person.',
 				'',
 				'  Try asking me:',
@@ -304,7 +295,7 @@ export const createCommands = (
 				'    ✓ Keep the conversation going (I remember context)',
 				'    ✓ Be cool and helpful at the same time',
 				'',
-				'  Real talk: I\'m here to make your life easier. Easy.',
+				"  Real talk: I'm here to make your life easier. Easy.",
 				''
 			]
 		}

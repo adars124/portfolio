@@ -142,7 +142,10 @@
 	const isScrolledToBottom = (): boolean => {
 		if (!terminalOutput) return true;
 		const threshold = 50; // pixels from bottom
-		return terminalOutput.scrollHeight - terminalOutput.scrollTop - terminalOutput.clientHeight < threshold;
+		return (
+			terminalOutput.scrollHeight - terminalOutput.scrollTop - terminalOutput.clientHeight <
+			threshold
+		);
 	};
 
 	const scrollToBottom = () => {
@@ -209,7 +212,11 @@
 				</div>
 
 				<!-- Terminal Output -->
-				<div bind:this={terminalOutput} onscroll={handleScroll} class="terminal-output mb-4 max-h-96 overflow-y-auto">
+				<div
+					bind:this={terminalOutput}
+					onscroll={handleScroll}
+					class="terminal-output mb-4 max-h-96 overflow-y-auto"
+				>
 					{#each history as entry}
 						<div class="mb-4">
 							<!-- Command -->
@@ -263,7 +270,7 @@
 				</div>
 
 				<!-- Input Line -->
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-3">
 					<span class="text-green-400">→</span>
 					<input
 						bind:this={terminalInput}
@@ -281,7 +288,29 @@
 								: 'Type a command...'}
 						disabled={isTyping || isAiProcessing}
 					/>
-					<span class="animate-pulse text-blue-400">▊</span>
+					<button
+						onclick={handleCommand}
+						disabled={isTyping || isAiProcessing || !input.trim()}
+						class="send-button group relative flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-500/30 transition-all duration-200 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-500/30 disabled:hover:shadow-none"
+						aria-label="Send command"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="h-5 w-5 text-cyan-400 transition-all group-hover:translate-x-0.5 group-hover:text-cyan-300 group-active:text-cyan-500"
+						>
+							<path d="M5 12h14" />
+							<path d="m12 5 7 7-7 7" />
+						</svg>
+						<div
+							class="absolute inset-0 -z-10 rounded-lg bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 transition-opacity group-hover:opacity-100"
+						></div>
+					</button>
 				</div>
 			</div>
 		</div>
