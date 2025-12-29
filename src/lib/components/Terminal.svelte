@@ -19,11 +19,13 @@
 	}: Props = $props();
 
 	let input = $state('');
-	let terminalInput: HTMLInputElement;
+	let terminalInput: HTMLInputElement | undefined;
+	let terminalOutput: HTMLElement | undefined;
 	let isTyping = $state(false);
 	let isAiProcessing = $state(false);
 	let isAiThinking = $state(false);
 	let streamingResponse = $state('');
+	let isUserScrolling = $state(false);
 
 	const gemini = getGeminiService();
 	const TYPEWRITER_SPEED = 10; // milliseconds per character
@@ -51,6 +53,9 @@
 		const userInput = input.trim();
 
 		if (!cmd) return;
+
+		// Reset scroll flag on new command
+		isUserScrolling = false;
 
 		const command = commands[cmd];
 
@@ -134,15 +139,38 @@
 		setTimeout(scrollToBottom, 0);
 	};
 
+	const isScrolledToBottom = (): boolean => {
+		if (!terminalOutput) return true;
+		const threshold = 50; // pixels from bottom
+		return terminalOutput.scrollHeight - terminalOutput.scrollTop - terminalOutput.clientHeight < threshold;
+	};
+
 	const scrollToBottom = () => {
-		const terminal = document.querySelector('.terminal-output');
-		if (terminal) {
-			terminal.scrollTop = terminal.scrollHeight;
+		// Only auto-scroll if user is already at the bottom
+		if (terminalOutput && !isUserScrolling) {
+			terminalOutput.scrollTop = terminalOutput.scrollHeight;
+		}
+	};
+
+	const handleScroll = () => {
+		// User manually scrolled up
+		if (!isScrolledToBottom()) {
+			isUserScrolling = true;
+		} else {
+			// User scrolled back to bottom
+			isUserScrolling = false;
 		}
 	};
 
 	const focusInput = () => {
 		terminalInput?.focus();
+	};
+
+	const handleKeyPress = () => {
+		// Auto-focus input on any keypress (except when already typing in input)
+		if (document.activeElement !== terminalInput && !isTyping && !isAiProcessing) {
+			terminalInput?.focus();
+		}
 	};
 
 	onMount(() => {
@@ -155,7 +183,7 @@
 	});
 </script>
 
-<svelte:window onclick={focusInput} />
+<svelte:window onclick={focusInput} onkeydown={handleKeyPress} />
 
 <div class="flex min-h-screen items-center justify-center bg-slate-950 p-4">
 	<div class="w-full max-w-4xl">
@@ -181,7 +209,7 @@
 				</div>
 
 				<!-- Terminal Output -->
-				<div class="terminal-output mb-4 max-h-96 overflow-y-auto">
+				<div bind:this={terminalOutput} onscroll={handleScroll} class="terminal-output mb-4 max-h-96 overflow-y-auto">
 					{#each history as entry}
 						<div class="mb-4">
 							<!-- Command -->
