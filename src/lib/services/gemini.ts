@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 import { env } from '$env/dynamic/public';
 
 interface ChatMessage {
@@ -39,6 +39,28 @@ class GeminiService {
 	// Google Search grounding tool
 	private groundingTool = {
 		googleSearch: {}
+	};
+
+	// Image generation function declaration for tool calling
+	private imageGenerationTool = {
+		functionDeclarations: [
+			{
+				name: 'generate_image',
+				description:
+					'Generates an artistic image based on a text description. Use this when the user wants to create, generate, visualize, or see an image, artwork, picture, wallpaper, or any visual content. This includes requests like "show me", "create a picture of", "generate artwork", "make a wallpaper", etc.',
+				parameters: {
+					type: Type.OBJECT,
+					properties: {
+						prompt: {
+							type: Type.STRING,
+							description:
+								'The detailed description of the image to generate. Include style, subject, colors, mood, and any other relevant details from the user request.'
+						}
+					},
+					required: ['prompt']
+				}
+			}
+		]
 	};
 
 	// System prompt for Jarvis
@@ -120,7 +142,46 @@ class GeminiService {
 	}
 
 	/**
-	 * Chat with Gemini using Google Search grounding (streaming)
+	 * Generates an image using Gemini 2.5 Flash Image model
+	 */
+	async generateImage(prompt: string): Promise<string> {
+		if (!this.isConfigured || !this.ai) {
+			throw new Error('AI is not configured');
+		}
+
+		try {
+			const response = await this.ai.models.generateContent({
+				model: 'gemini-2.5-flash-image',
+				contents: prompt
+			});
+
+			// Extract image data from response
+			if (!response.candidates || !response.candidates[0]) {
+				throw new Error('No candidates in response');
+			}
+
+			const candidate = response.candidates[0];
+			if (!candidate.content || !candidate.content.parts) {
+				throw new Error('No content parts in response');
+			}
+
+			for (const part of candidate.content.parts) {
+				if (part.inlineData) {
+					const imageData = part.inlineData.data;
+					// Return base64 data URL for browser display
+					return `data:image/png;base64,${imageData}`;
+				}
+			}
+
+			throw new Error('No image data in response');
+		} catch (error) {
+			console.error('Image generation error:', error);
+			throw error;
+		}
+	}
+
+	/**
+	 * Chat with Gemini using Google Search grounding and function calling (streaming)
 	 */
 	async *chatStream(message: string): AsyncGenerator<string, void, unknown> {
 		if (!this.isConfigured || !this.ai) {
@@ -129,7 +190,7 @@ class GeminiService {
 		}
 
 		try {
-			// Build conversation contents with history ONLY
+			// Build conversation contents with history
 			const contents = [
 				...this.chatHistory.map((msg) => ({
 					role: msg.role,
@@ -141,7 +202,63 @@ class GeminiService {
 				}
 			];
 
-			// Generate content (streaming) with PROPER system instruction
+			// First, check if this might be an image generation request using function calling
+			// We need to make a separate call to determine intent
+			const intentResponse = await this.ai.models.generateContent({
+				model: this.modelName,
+				contents: [
+					{
+						role: 'user' as const,
+						parts: [{ text: message }]
+					}
+				],
+				config: {
+					systemInstruction: {
+						role: 'system',
+						parts: [
+							{
+								text: 'You are an intent classifier. Determine if the user wants to generate/create/visualize an image or artwork. If yes, call the generate_image function.'
+							}
+						]
+					},
+					tools: [this.imageGenerationTool],
+					maxOutputTokens: 100,
+					temperature: 0.3
+				}
+			});
+
+			// Check if intent detection resulted in a function call
+			if (intentResponse.functionCalls && intentResponse.functionCalls.length > 0) {
+				const functionCall = intentResponse.functionCalls[0];
+				if (functionCall.name === 'generate_image') {
+					const imagePrompt = (functionCall.args?.prompt as string) || message;
+
+					try {
+						yield '🎨 Generating image...\n\n__IMAGE_GENERATION__';
+						const imageUrl = await this.generateImage(imagePrompt);
+						yield `__IMAGE_READY__${imageUrl}`;
+
+						// Update history with function call
+						this.chatHistory.push(
+							{ role: 'user', parts: [{ text: message }] },
+							{
+								role: 'model',
+								parts: [{ text: `Generated image: ${imagePrompt}` }]
+							}
+						);
+					} catch (error) {
+						console.error('Image generation error:', error);
+						if (error instanceof Error) {
+							yield `__IMAGE_ERROR__Image generation failed: ${error.message}`;
+						} else {
+							yield '__IMAGE_ERROR__Image generation failed. Please try again.';
+						}
+					}
+					return;
+				}
+			}
+
+			// Not an image generation request - proceed with normal chat using grounding
 			const response = await this.ai.models.generateContentStream({
 				model: this.modelName,
 				contents,
@@ -150,7 +267,6 @@ class GeminiService {
 						role: 'system',
 						parts: [{ text: this.systemPrompt }]
 					},
-
 					tools: [this.groundingTool],
 					maxOutputTokens: 2048,
 					temperature: 0.9,
@@ -161,7 +277,7 @@ class GeminiService {
 
 			let fullResponse = '';
 
-			// Stream the response chunks
+			// Process the response chunks
 			for await (const chunk of response) {
 				const text = chunk.text || '';
 				fullResponse += text;
