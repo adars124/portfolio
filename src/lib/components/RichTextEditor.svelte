@@ -4,6 +4,10 @@
 	import StarterKit from '@tiptap/starter-kit';
 	import Link from '@tiptap/extension-link';
 	import Image from '@tiptap/extension-image';
+	import { Table } from '@tiptap/extension-table';
+	import { TableRow } from '@tiptap/extension-table-row';
+	import { TableCell } from '@tiptap/extension-table-cell';
+	import { TableHeader } from '@tiptap/extension-table-header';
 
 	interface Props {
 		content?: string;
@@ -30,6 +34,23 @@
 				Image.configure({
 					HTMLAttributes: {
 						class: 'max-w-full h-auto rounded-lg'
+					}
+				}),
+				Table.configure({
+					resizable: true,
+					HTMLAttributes: {
+						class: 'border-collapse border border-slate-600'
+					}
+				}),
+				TableRow,
+				TableCell.configure({
+					HTMLAttributes: {
+						class: 'border border-slate-600'
+					}
+				}),
+				TableHeader.configure({
+					HTMLAttributes: {
+						class: 'border border-slate-600 bg-slate-700 font-semibold'
 					}
 				})
 			],
@@ -109,6 +130,43 @@
 		editor?.chain().focus().setHorizontalRule().run();
 	}
 
+	// Table functions
+	function insertTable() {
+		editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+	}
+
+	function addColumnBefore() {
+		editor?.chain().focus().addColumnBefore().run();
+	}
+
+	function addColumnAfter() {
+		editor?.chain().focus().addColumnAfter().run();
+	}
+
+	function deleteColumn() {
+		editor?.chain().focus().deleteColumn().run();
+	}
+
+	function addRowBefore() {
+		editor?.chain().focus().addRowBefore().run();
+	}
+
+	function addRowAfter() {
+		editor?.chain().focus().addRowAfter().run();
+	}
+
+	function deleteRow() {
+		editor?.chain().focus().deleteRow().run();
+	}
+
+	function deleteTable() {
+		editor?.chain().focus().deleteTable().run();
+	}
+
+	function toggleHeaderRow() {
+		editor?.chain().focus().toggleHeaderRow().run();
+	}
+
 	// Get HTML content
 	export function getHTML(): string {
 		return editor?.getHTML() || '';
@@ -116,13 +174,13 @@
 </script>
 
 <!-- Editor Toolbar -->
-<div class="border border-slate-700 rounded-t-lg bg-slate-800 p-2 flex flex-wrap gap-1">
+<div class="flex flex-wrap gap-1 rounded-t-lg border border-slate-700 bg-slate-800 p-2">
 	<!-- Headings -->
 	<div class="flex gap-1 border-r border-slate-700 pr-2">
 		<button
 			type="button"
 			onclick={() => toggleHeading(2)}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Heading 2"
 		>
 			H2
@@ -130,7 +188,7 @@
 		<button
 			type="button"
 			onclick={() => toggleHeading(3)}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Heading 3"
 		>
 			H3
@@ -142,7 +200,7 @@
 		<button
 			type="button"
 			onclick={toggleBold}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors font-bold"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm font-bold text-slate-300 transition-colors hover:bg-slate-600"
 			title="Bold"
 		>
 			B
@@ -150,7 +208,7 @@
 		<button
 			type="button"
 			onclick={toggleItalic}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors italic"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 italic transition-colors hover:bg-slate-600"
 			title="Italic"
 		>
 			I
@@ -158,7 +216,7 @@
 		<button
 			type="button"
 			onclick={toggleStrike}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors line-through"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 line-through transition-colors hover:bg-slate-600"
 			title="Strikethrough"
 		>
 			S
@@ -166,7 +224,7 @@
 		<button
 			type="button"
 			onclick={toggleCode}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors font-mono"
+			class="rounded bg-slate-700 px-3 py-1.5 font-mono text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Inline Code"
 		>
 			{'<>'}
@@ -178,7 +236,7 @@
 		<button
 			type="button"
 			onclick={toggleBulletList}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Bullet List"
 		>
 			• List
@@ -186,7 +244,7 @@
 		<button
 			type="button"
 			onclick={toggleOrderedList}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Numbered List"
 		>
 			1. List
@@ -198,7 +256,7 @@
 		<button
 			type="button"
 			onclick={toggleCodeBlock}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Code Block"
 		>
 			Code
@@ -206,7 +264,7 @@
 		<button
 			type="button"
 			onclick={toggleBlockquote}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Quote"
 		>
 			"
@@ -214,11 +272,11 @@
 	</div>
 
 	<!-- Insert -->
-	<div class="flex gap-1">
+	<div class="flex gap-1 border-r border-slate-700 pr-2">
 		<button
 			type="button"
 			onclick={addLink}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Add Link"
 		>
 			Link
@@ -226,7 +284,7 @@
 		<button
 			type="button"
 			onclick={addImage}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Add Image"
 		>
 			Image
@@ -234,12 +292,95 @@
 		<button
 			type="button"
 			onclick={setHorizontalRule}
-			class="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
 			title="Horizontal Rule"
 		>
 			—
 		</button>
 	</div>
+
+	<!-- Table -->
+	<div class="flex gap-1">
+		<button
+			type="button"
+			onclick={insertTable}
+			class="rounded bg-slate-700 px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-600"
+			title="Insert Table"
+		>
+			Table
+		</button>
+	</div>
+</div>
+
+<!-- Table Controls (shown when cursor is in a table) -->
+<div class="flex flex-wrap gap-1 border-x border-slate-700 bg-slate-900 p-1.5 text-xs">
+	<span class="self-center px-2 text-slate-500">Table:</span>
+	<button
+		type="button"
+		onclick={addRowBefore}
+		class="rounded bg-slate-700 px-2 py-1 text-slate-300 transition-colors hover:bg-slate-600"
+		title="Add Row Before"
+	>
+		+ Row Above
+	</button>
+	<button
+		type="button"
+		onclick={addRowAfter}
+		class="rounded bg-slate-700 px-2 py-1 text-slate-300 transition-colors hover:bg-slate-600"
+		title="Add Row After"
+	>
+		+ Row Below
+	</button>
+	<button
+		type="button"
+		onclick={deleteRow}
+		class="rounded bg-slate-700 px-2 py-1 text-slate-300 transition-colors hover:bg-red-600"
+		title="Delete Row"
+	>
+		- Row
+	</button>
+	<span class="mx-1 border-l border-slate-600"></span>
+	<button
+		type="button"
+		onclick={addColumnBefore}
+		class="rounded bg-slate-700 px-2 py-1 text-slate-300 transition-colors hover:bg-slate-600"
+		title="Add Column Before"
+	>
+		+ Col Left
+	</button>
+	<button
+		type="button"
+		onclick={addColumnAfter}
+		class="rounded bg-slate-700 px-2 py-1 text-slate-300 transition-colors hover:bg-slate-600"
+		title="Add Column After"
+	>
+		+ Col Right
+	</button>
+	<button
+		type="button"
+		onclick={deleteColumn}
+		class="rounded bg-slate-700 px-2 py-1 text-slate-300 transition-colors hover:bg-red-600"
+		title="Delete Column"
+	>
+		- Col
+	</button>
+	<span class="mx-1 border-l border-slate-600"></span>
+	<button
+		type="button"
+		onclick={toggleHeaderRow}
+		class="rounded bg-slate-700 px-2 py-1 text-slate-300 transition-colors hover:bg-slate-600"
+		title="Toggle Header Row"
+	>
+		Header
+	</button>
+	<button
+		type="button"
+		onclick={deleteTable}
+		class="rounded bg-red-700 px-2 py-1 text-slate-200 transition-colors hover:bg-red-600"
+		title="Delete Table"
+	>
+		Delete Table
+	</button>
 </div>
 
 <!-- Editor -->
@@ -339,5 +480,64 @@
 
 	:global(.ProseMirror a:hover) {
 		color: rgb(147 197 253);
+	}
+
+	/* Table styles */
+	:global(.ProseMirror table) {
+		border-collapse: collapse;
+		width: auto;
+		margin: 1rem 0;
+		overflow: hidden;
+	}
+
+	:global(.ProseMirror th),
+	:global(.ProseMirror td) {
+		border: 1px solid rgb(71 85 105);
+		padding: 0.25rem 0.5rem;
+		text-align: left;
+		vertical-align: middle;
+		min-width: 50px;
+		line-height: 1.2;
+	}
+
+	:global(.ProseMirror th) {
+		background-color: rgb(51 65 85);
+		font-weight: 600;
+		color: rgb(241 245 249);
+	}
+
+	:global(.ProseMirror td) {
+		background-color: rgb(30 41 59);
+		color: rgb(203 213 225);
+	}
+
+	:global(.ProseMirror tr:hover td) {
+		background-color: rgb(51 65 85);
+	}
+
+	:global(.ProseMirror th p),
+	:global(.ProseMirror td p) {
+		margin: 0;
+		padding: 0;
+	}
+
+	/* Selected cell styling */
+	:global(.ProseMirror .selectedCell) {
+		background-color: rgb(59 130 246 / 0.3) !important;
+	}
+
+	/* Column resize handle */
+	:global(.ProseMirror .column-resize-handle) {
+		position: absolute;
+		right: -2px;
+		top: 0;
+		bottom: 0;
+		width: 4px;
+		background-color: rgb(59 130 246);
+		cursor: col-resize;
+	}
+
+	:global(.ProseMirror.resize-cursor) {
+		cursor: col-resize;
 	}
 </style>

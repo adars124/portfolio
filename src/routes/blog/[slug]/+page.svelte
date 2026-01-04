@@ -186,22 +186,48 @@
 	}
 
 	:global(.prose table) {
-		width: 100%;
+		width: auto;
 		border-collapse: collapse;
 		margin-top: 1.5rem;
 		margin-bottom: 1.5rem;
+		overflow-x: auto;
+		display: table;
 	}
 
 	:global(.prose th) {
-		background-color: rgb(30 41 59);
+		background-color: rgb(51 65 85);
 		color: rgb(241 245 249);
 		font-weight: 600;
-		padding: 0.75rem;
-		border: 1px solid rgb(51 65 85);
+		padding: 0.25rem 0.5rem;
+		border: 1px solid rgb(71 85 105);
+		text-align: left;
+		font-size: 0.9rem;
+		line-height: 1.2;
 	}
 
 	:global(.prose td) {
-		padding: 0.75rem;
-		border: 1px solid rgb(51 65 85);
+		padding: 0.25rem 0.5rem;
+		border: 1px solid rgb(71 85 105);
+		background-color: rgb(30 41 59);
+		font-size: 0.9rem;
+		line-height: 1.2;
+	}
+
+	:global(.prose tr:hover td) {
+		background-color: rgb(51 65 85);
+	}
+
+	:global(.prose th p),
+	:global(.prose td p) {
+		margin: 0;
+		padding: 0;
+	}
+
+	:global(.prose tbody tr:nth-child(even) td) {
+		background-color: rgb(15 23 42);
+	}
+
+	:global(.prose tbody tr:nth-child(even):hover td) {
+		background-color: rgb(51 65 85);
 	}
 </style>
