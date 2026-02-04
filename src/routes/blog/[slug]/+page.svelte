@@ -24,20 +24,20 @@
 <div class="min-h-screen bg-slate-950">
 	<!-- Header -->
 	<div class="border-b border-slate-800">
-		<div class="max-w-4xl mx-auto px-4 py-8">
+		<div class="mx-auto max-w-4xl px-4 py-8">
 			<a
 				href="/blog"
-				class="text-slate-400 hover:text-slate-300 transition-colors flex items-center gap-2 mb-8"
+				class="mb-8 flex items-center gap-2 text-slate-400 transition-colors hover:text-slate-300"
 			>
 				<span>←</span>
 				<span>Back to Blog</span>
 			</a>
 
-			<h1 class="text-4xl md:text-5xl font-bold text-slate-100 mb-4">
+			<h1 class="mb-4 text-4xl font-bold text-slate-100 md:text-5xl">
 				{data.post.title}
 			</h1>
 
-			<p class="text-xl text-slate-300 mb-6">
+			<p class="mb-6 text-xl text-slate-300">
 				{data.post.description}
 			</p>
 
@@ -52,11 +52,11 @@
 			</div>
 
 			{#if data.post.tags.length > 0}
-				<div class="flex flex-wrap gap-2 mt-6">
+				<div class="mt-6 flex flex-wrap gap-2">
 					{#each data.post.tags as tag}
 						<a
 							href="/blog/tag/{tag.slug}"
-							class="px-3 py-1 text-sm rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600 transition-colors"
+							class="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-sm text-slate-300 transition-colors hover:border-slate-600"
 						>
 							{tag.name}
 						</a>
@@ -68,30 +68,26 @@
 
 	<!-- Cover Image -->
 	{#if data.post.coverImage}
-		<div class="max-w-4xl mx-auto px-4 py-8">
+		<div class="mx-auto max-w-4xl px-4 py-8">
 			<div class="aspect-video overflow-hidden rounded-lg bg-slate-800">
-				<img
-					src={data.post.coverImage}
-					alt={data.post.title}
-					class="w-full h-full object-cover"
-				/>
+				<img src={data.post.coverImage} alt={data.post.title} class="h-full w-full" />
 			</div>
 		</div>
 	{/if}
 
 	<!-- Blog Content -->
-	<article class="max-w-4xl mx-auto px-4 py-8">
-		<div class="prose prose-invert prose-slate max-w-none">
+	<article class="mx-auto max-w-4xl px-4 py-8">
+		<div class="prose max-w-none prose-slate prose-invert">
 			{@html processedContent}
 		</div>
 	</article>
 
 	<!-- Footer -->
-	<div class="max-w-4xl mx-auto px-4 py-12 border-t border-slate-800">
+	<div class="mx-auto max-w-4xl border-t border-slate-800 px-4 py-12">
 		<div class="flex justify-center">
 			<a
 				href="/blog"
-				class="px-6 py-3 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors"
+				class="rounded-lg border border-slate-700 bg-slate-800 px-6 py-3 text-slate-300 transition-colors hover:border-slate-600 hover:bg-slate-700"
 			>
 				← Back to all posts
 			</a>
