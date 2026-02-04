@@ -70,7 +70,11 @@
 	{#if data.post.coverImage}
 		<div class="mx-auto max-w-4xl px-4 py-8">
 			<div class="aspect-video overflow-hidden rounded-lg bg-slate-800">
-				<img src={data.post.coverImage} alt={data.post.title} class="h-full w-full" />
+				<img
+					src={data.post.coverImage}
+					alt={data.post.title}
+					class="h-full w-full object-contain"
+				/>
 			</div>
 		</div>
 	{/if}
